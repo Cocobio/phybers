@@ -5,7 +5,10 @@ from .Tools.visualizationEnums import VisualizationObject
 from .Shaders import Shader
 from .Tools import glm
 from .BoundingBox import BoundingBox
-from importlib_resources import files
+try:
+    from importlib.resources import files
+except ImportError:
+    from importlib_resources import files
 
 _vs_vs = files('phybers.fibervis.shaders').joinpath('volume-slice.vs')
 _s_fs = files('phybers.fibervis.shaders').joinpath('slice.fs')
@@ -93,7 +96,7 @@ class Slice(VisualizationBaseObject):
         self.clean = True
 
     def get_center(self):
-        return self.boundingbox.get_center()
+        return self.boundingbox.get_center() + self.translateMat[:3, 3].flat
 
     def get_size(self):
         return self.boundingbox.get_size()
@@ -104,11 +107,11 @@ class Slice(VisualizationBaseObject):
         v1 = np.array([0,1,3,-1, 1,0,1,3, 0,4,5,-1, 4,0,4,5, 0,2,6,-1, 2,0,2,6], dtype=np.int32)
         v2 = np.array([1,3,7,-1, 5,1,3,7, 4,5,7,-1, 6,4,5,7, 2,6,7,-1, 3,2,6,7], dtype=np.int32)
 
-        nSequence = np.array([	0,1,2,3,4,5,6,7, 1,3,0,2,5,7,4,6, 2,0,3,1,6,4,7,5, 3,2,1,0,7,6,5,4,
+        nSequence = np.array([  0,1,2,3,4,5,6,7, 1,3,0,2,5,7,4,6, 2,0,3,1,6,4,7,5, 3,2,1,0,7,6,5,4,
                                 4,0,6,2,5,1,7,3, 5,1,4,0,7,3,6,2, 6,2,7,3,4,0,5,1, 7,6,3,2,5,4,1,0], dtype=np.int32)
 
-        self.vertexPoints = np.array([	1,1,0,	1,1,1,	0,1,0,	0,1,1,
-                                        1,0,0,	1,0,1,	0,0,0,	0,0,1], dtype=np.float32).reshape((8,3))
+        self.vertexPoints = np.array([  1,1,0,  1,1,1,  0,1,0,  0,1,1,
+                                        1,0,0,  1,0,1,  0,0,0,  0,0,1], dtype=np.float32).reshape((8,3))
 
         GL.glUniform1iv(self.shader[0].glGetUniformLocation("v1"), v1.size, v1)
         GL.glUniform1iv(self.shader[0].glGetUniformLocation("v2"), v2.size, v2)

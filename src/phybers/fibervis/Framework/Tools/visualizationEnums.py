@@ -34,6 +34,7 @@ class VisualizationActions(Enum):
     LoadAndApplyMatrix = 10
     ShaderSelection = 11
     FocusObject = 12
+    ColorSelection = 13
 
 
 class SegmentationTypes(Enum):
@@ -54,3 +55,4 @@ segmentations = {
 
 mriVisualizations = {'Volume render': VisualizationObject.MRIVolume,
                      'Slice': VisualizationObject.MRISlice}
+

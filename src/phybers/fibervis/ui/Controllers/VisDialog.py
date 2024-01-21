@@ -4,16 +4,20 @@ Dictionary is keeping a reference to the segmentations objects... not deleting
 
 import PyQt5
 from PyQt5 import QtGui, QtWidgets, uic, QtCore
-from importlib_resources import files
+try:
+    from importlib.resources import files
+except ImportError:
+    from importlib_resources import files
 from .InPlaceSegmentationDialog import InPlaceSegmentationDialog
 from .ROIsSegmentationDialog import ROIsSegmentationDialog
 from .AtlasBasedParallelSegmentationDialog import AtlasBasedParallelSegmentationDialog
 from .FFClustSegmentationDialog import FFClustSegmentationDialog
 from ...Framework.Tools.visualizationEnums import SegmentationTypes, segmentations, mriVisualizations, VisualizationActions, VisualizationObject
 from ...Framework.Segmentation.SegmentationHandler import SegmentationHandler
+from ...Framework.Mesh import Mesh
 
 _vot_ui = files('phybers.fibervis.ui').joinpath(
-    'visualizationObjectsTool.ui')
+                'visualizationObjectsTool.ui')
 
 
 def identifyNumberRecursively(item, number):
@@ -545,7 +549,6 @@ class VisDialog(QtWidgets.QDialog):
                 self.ui.drawLinesCheckBox.setChecked(refObj.drawableLines)
                 self.ui.opacitySlider.setValue(
                     int(self.ui.opacitySlider.maximum()*refObj.alpha))
-
                 self.ui.colorWidget.setAutoFillBackground(True)
                 self.ui.colorWidget.setPalette(
                     QtGui.QPalette(QtGui.QColor(*(refObj.getRGB256()))))
@@ -561,6 +564,7 @@ class VisDialog(QtWidgets.QDialog):
                 self.meshGroupBox.hide()
 
         self.selectedObject.emit({'current': activeObject})
+
 
     @QtCore.pyqtSlot()
     def rotateItemSelected(self):
@@ -597,7 +601,7 @@ class VisDialog(QtWidgets.QDialog):
 
         if item == None:
             return
-
+          
         modifyObject = self.prepareDictionary(
             item, VisualizationActions.ResetTransforms)
 
@@ -620,6 +624,7 @@ class VisDialog(QtWidgets.QDialog):
             item, VisualizationActions.LoadAndApplyMatrix, data=matrixFile[0])
 
         self.changeObject.emit(modifyObject)
+        
 
     @QtCore.pyqtSlot()
     def translateItemSelected(self):
@@ -643,6 +648,7 @@ class VisDialog(QtWidgets.QDialog):
 
         self.changeObject.emit(modifyObject)
 
+        
     @QtCore.pyqtSlot()
     def scaleItemSelected(self):
         item = self.ui.treeWidget.currentItem()
@@ -665,6 +671,7 @@ class VisDialog(QtWidgets.QDialog):
             item, VisualizationActions.Scale, data=v)
 
         self.changeObject.emit(modifyObject)
+        
 
     @QtCore.pyqtSlot()
     def modifyBundleObject(self):
@@ -675,6 +682,7 @@ class VisDialog(QtWidgets.QDialog):
             item, VisualizationActions.ShaderSelection, data=(shaderSelected))
 
         self.changeObject.emit(modifyObject)
+
 
     @QtCore.pyqtSlot()
     def modifySliceObject(self):
@@ -725,6 +733,7 @@ class VisDialog(QtWidgets.QDialog):
 
         self.changeObject.emit(modifyObject)
 
+
     @QtCore.pyqtSlot()
     def modifyVolumeObject(self):
         item = self.ui.treeWidget.currentItem()
@@ -743,6 +752,7 @@ class VisDialog(QtWidgets.QDialog):
             item, VisualizationActions.VolumeModification, data)
 
         self.changeObject.emit(modifyObject)
+
 
     @QtCore.pyqtSlot()
     def modifyMeshObject(self):
@@ -782,6 +792,7 @@ class VisDialog(QtWidgets.QDialog):
 
         self.changeObject.emit(modifyObject)
 
+
     @QtCore.pyqtSlot(list)
     def objectsChanged(self, objects):
         for dialogs in self.windows.keys():
@@ -790,6 +801,7 @@ class VisDialog(QtWidgets.QDialog):
             except:
                 pass
 
+              
     def bundleGBSignals(self, action='connect'):
         getattr(self.ui.shaderRadioButton_0.clicked,
                 action)(self.modifyBundleObject)
